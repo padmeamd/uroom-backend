@@ -68,7 +68,7 @@ Key design decisions:
 - **Spring Data JPA**
 - **PostgreSQL**
 - **Lombok**
-- **Maven**
+- **Gradle**
 
 ---
 
