@@ -26,7 +26,7 @@ public class Room {
     @Column(nullable = false)
     private int membersLimit;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "room_tags", joinColumns = @JoinColumn(name = "room_id"))
     @Column(name = "tag")
     private List<String> tags;

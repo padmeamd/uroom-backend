@@ -1,0 +1,18 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: uroom-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: uroom
+      POSTGRES_USER: uroom
+      POSTGRES_PASSWORD: uroom
+    volumes:
+      - uroom_pg_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  uroom_pg_data:
