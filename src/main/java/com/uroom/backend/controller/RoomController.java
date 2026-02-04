@@ -5,6 +5,7 @@ import com.uroom.backend.dto.RoomResponse;
 import com.uroom.backend.service.RoomService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,5 +33,11 @@ public class RoomController {
             @RequestParam(required = false) String tag
     ) {
         return roomService.findAll(tag);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        roomService.deleteById(id);
+        return ResponseEntity.noContent().build();
     }
 }

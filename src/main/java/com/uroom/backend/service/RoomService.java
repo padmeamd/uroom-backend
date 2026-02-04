@@ -62,4 +62,11 @@ public class RoomService {
                 .map(this::toResponse)
                 .toList();
     }
+
+    public void deleteById(UUID id) {
+        if (!roomRepository.existsById(id)) {
+            throw new IllegalArgumentException("CANNOT FIND ROOM: " + id);
+        }
+        roomRepository.deleteById(id);
+    }
 }
