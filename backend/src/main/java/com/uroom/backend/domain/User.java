@@ -30,6 +30,9 @@ public class User {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @Column(nullable = false)
+    private String password;
+
     private String university;
 
     private Integer age;
@@ -69,15 +72,17 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public User(String name, String email) {
+    public User(String name, String email, String password) {
         this.name = name;
         this.email = email;
+        this.password = password;
     }
 
-    public User(String supabaseId, String name, String email) {
+    public User(String supabaseId, String name, String email, String password) {
         this.supabaseId = supabaseId;
         this.name = name;
         this.email = email;
+        this.password = password;
     }
 
     public void addXp(int amount) {
