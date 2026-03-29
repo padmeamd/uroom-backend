@@ -29,6 +29,12 @@ public class UserService {
             .orElseThrow(() -> new IllegalArgumentException("User not found with email: " + email));
     }
 
+    public UserResponse findBySupabaseId(String supabaseId) {
+        return userRepository.findBySupabaseId(supabaseId)
+            .map(UserResponse::from)
+            .orElseThrow(() -> new IllegalArgumentException("User not found with supabaseId: " + supabaseId));
+    }
+
     public List<UserResponse> findAll() {
         return userRepository.findAll().stream()
             .map(UserResponse::from)
@@ -36,8 +42,8 @@ public class UserService {
     }
 
     @Transactional
-    public UserResponse create(String name, String email) {
-        User user = new User(name, email);
+    public UserResponse create(String supabaseId, String name, String email) {
+        User user = new User(supabaseId, name, email);
         return UserResponse.from(userRepository.save(user));
     }
 

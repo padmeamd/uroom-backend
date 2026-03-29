@@ -1,5 +1,6 @@
 package com.uroom.backend.controller;
 
+import com.uroom.backend.dto.CreateUserRequest;
 import com.uroom.backend.dto.UpdateUserRequest;
 import com.uroom.backend.dto.UserResponse;
 import com.uroom.backend.service.UserService;
@@ -28,14 +29,19 @@ public class UserController {
         return userService.findByEmail(email);
     }
 
+    @GetMapping("/supabase/{supabaseId}")
+    public UserResponse getBySupabaseId(@PathVariable String supabaseId) {
+        return userService.findBySupabaseId(supabaseId);
+    }
+
     @GetMapping
     public List<UserResponse> getAll() {
         return userService.findAll();
     }
 
     @PostMapping
-    public UserResponse create(@RequestParam String name, @RequestParam String email) {
-        return userService.create(name, email);
+    public UserResponse create(@RequestBody @Valid CreateUserRequest request) {
+        return userService.create(request.supabaseId(), request.name(), request.email());
     }
 
     @PutMapping("/{id}")

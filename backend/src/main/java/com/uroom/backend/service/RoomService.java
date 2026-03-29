@@ -53,11 +53,6 @@ public class RoomService {
         
         Room saved = roomRepository.save(room);
         
-        if (saved.getCreatorId() != null) {
-            Chat chat = new Chat(saved.getId());
-            chatRepository.save(chat);
-        }
-        
         return RoomResponse.from(saved);
     }
 

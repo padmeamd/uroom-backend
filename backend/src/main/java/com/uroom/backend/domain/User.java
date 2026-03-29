@@ -21,6 +21,9 @@ public class User {
     @GeneratedValue
     private UUID id;
 
+    @Column(name = "supabase_id", unique = true)
+    private String supabaseId;
+
     @Column(nullable = false)
     private String name;
 
@@ -67,6 +70,12 @@ public class User {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     public User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+
+    public User(String supabaseId, String name, String email) {
+        this.supabaseId = supabaseId;
         this.name = name;
         this.email = email;
     }
