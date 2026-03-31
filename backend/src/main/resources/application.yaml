@@ -15,5 +15,5 @@ server:
   port: 8080
 
 jwt:
-  secret: your-256-bit-secret-key-for-jwt-signing-must-be-long-enough
-  expiration-ms: 86400000
+  secret: ${JWT_SECRET:uroom-super-secret-jwt-signing-key-change-in-production-32chars}
+  expiration-ms: ${JWT_EXPIRATION_MS:86400000}

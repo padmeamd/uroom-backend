@@ -9,7 +9,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -30,7 +29,7 @@ public class AuthController {
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal UserDetails user) {
-        return ResponseEntity.ok(authService.getCurrentUser((com.uroom.backend.domain.User) user));
+    public ResponseEntity<UserResponse> getCurrentUser(@AuthenticationPrincipal com.uroom.backend.domain.User user) {
+        return ResponseEntity.ok(authService.getCurrentUser(user));
     }
 }
