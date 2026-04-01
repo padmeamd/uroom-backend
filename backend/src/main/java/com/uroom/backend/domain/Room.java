@@ -58,7 +58,7 @@ public class Room {
     @Column(name = "is_urgent")
     private boolean urgent = false;
 
-    @Column(name = "max_members")
+    @Column(name = "members_limit")
     private int maxMembers;
 
     @Column(name = "current_members")

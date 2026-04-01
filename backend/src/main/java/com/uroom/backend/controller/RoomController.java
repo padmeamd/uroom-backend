@@ -110,4 +110,11 @@ public class RoomController {
     public List<RoomResponse> getUserRooms(@PathVariable UUID userId) {
         return roomService.findByCreator(userId);
     }
+
+    @GetMapping("/joined/{userId}")
+    public List<RoomResponse> getJoinedRooms(@PathVariable UUID userId) {
+        return roomMemberService.getUserRooms(userId).stream()
+                .map(m -> roomService.findById(m.roomId()))
+                .collect(java.util.stream.Collectors.toList());
+    }
 }
