@@ -25,3 +25,8 @@ jwt:
 
 app:
   upload-dir: ${user.home}/.uroom/uploads
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:3000}
+
+security:
+  cors-csrf-enabled: false
