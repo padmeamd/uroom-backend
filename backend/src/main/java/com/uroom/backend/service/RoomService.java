@@ -63,17 +63,27 @@ public class RoomService {
                 .toList();
     }
 
+    /** Returns true if an EVENT's date has already passed — it should not be recommended. */
+    private boolean isWrappedUp(Room room) {
+        return room.getRoomType() == RoomType.EVENT
+                && room.getDateTime() != null
+                && room.getDateTime().isBefore(LocalDateTime.now());
+    }
+
     public List<RoomResponse> findByFilter(String filter, RoomType type) {
-        List<Room> rooms = roomRepository.findAll();
-        
+        LocalDateTime now = LocalDateTime.now();
+
+        List<Room> rooms = roomRepository.findAll().stream()
+                // Never recommend events whose date has already passed
+                .filter(r -> !isWrappedUp(r))
+                .collect(Collectors.toList());
+
         if (type != null) {
             rooms = rooms.stream()
                 .filter(r -> r.getRoomType() == type)
                 .collect(Collectors.toList());
         }
-        
-        LocalDateTime now = LocalDateTime.now();
-        
+
         switch (filter != null ? filter.toLowerCase() : "all") {
             case "this-week":
                 rooms = rooms.stream()
@@ -99,7 +109,7 @@ public class RoomService {
             default:
                 break;
         }
-        
+
         return rooms.stream()
             .sorted((a, b) -> {
                 if (a.isUrgent() && !b.isUrgent()) return -1;
@@ -114,10 +124,11 @@ public class RoomService {
         if (query == null || query.isBlank()) {
             return findAll();
         }
-        
+
         String lowerQuery = query.toLowerCase();
         return roomRepository.findAll().stream()
-            .filter(r -> 
+            .filter(r -> !isWrappedUp(r))
+            .filter(r ->
                 (r.getTitle() != null && r.getTitle().toLowerCase().contains(lowerQuery)) ||
                 (r.getDescription() != null && r.getDescription().toLowerCase().contains(lowerQuery)) ||
                 r.getTags().stream().anyMatch(t -> t.toLowerCase().contains(lowerQuery))
@@ -136,6 +147,7 @@ public class RoomService {
 
     public List<RoomResponse> findByTag(String tag) {
         return roomRepository.findByTag(tag).stream()
+            .filter(r -> !isWrappedUp(r))
             .map(RoomResponse::from)
             .collect(Collectors.toList());
     }
