@@ -2,6 +2,7 @@ package com.uroom.backend.controller;
 
 import com.uroom.backend.domain.Room.RoomType;
 import com.uroom.backend.dto.CreateRoomRequest;
+import com.uroom.backend.dto.MemberWithProfileResponse;
 import com.uroom.backend.dto.QuizQuestionRequest;
 import com.uroom.backend.dto.QuizQuestionResponse;
 import com.uroom.backend.dto.RoomMemberResponse;
@@ -95,6 +96,28 @@ public class RoomController {
         return roomMemberService.getRoomMembers(id);
     }
 
+    @GetMapping("/{id}/members/profiles")
+    public List<MemberWithProfileResponse> getMembersWithProfiles(@PathVariable UUID id) {
+        return roomMemberService.getRoomMembersWithProfiles(id);
+    }
+
+    @GetMapping("/{id}/pending")
+    public List<MemberWithProfileResponse> getPendingMembers(@PathVariable UUID id) {
+        return roomMemberService.getPendingMembers(id);
+    }
+
+    @PostMapping("/{id}/members/{userId}/accept")
+    public ResponseEntity<Void> acceptMember(@PathVariable UUID id, @PathVariable UUID userId) {
+        roomMemberService.acceptMember(id, userId);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/{id}/members/{userId}/reject")
+    public ResponseEntity<Void> rejectMember(@PathVariable UUID id, @PathVariable UUID userId) {
+        roomMemberService.rejectMember(id, userId);
+        return ResponseEntity.noContent().build();
+    }
+
     @GetMapping("/{id}/quiz-questions")
     public List<QuizQuestionResponse> getQuizQuestions(@PathVariable UUID id) {
         return roomService.getQuizQuestions(id);
@@ -114,7 +137,11 @@ public class RoomController {
     @GetMapping("/joined/{userId}")
     public List<RoomResponse> getJoinedRooms(@PathVariable UUID userId) {
         return roomMemberService.getUserRooms(userId).stream()
-                .map(m -> roomService.findById(m.roomId()))
+                .map(m -> {
+                    try { return roomService.findById(m.roomId()); }
+                    catch (IllegalArgumentException e) { return null; }
+                })
+                .filter(r -> r != null)
                 .collect(java.util.stream.Collectors.toList());
     }
 }

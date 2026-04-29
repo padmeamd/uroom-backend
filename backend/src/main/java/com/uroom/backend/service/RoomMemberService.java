@@ -5,6 +5,7 @@ import com.uroom.backend.domain.RoomMember;
 import com.uroom.backend.domain.RoomMember.MemberStatus;
 import com.uroom.backend.domain.User;
 import com.uroom.backend.dto.JoinRoomRequest;
+import com.uroom.backend.dto.MemberWithProfileResponse;
 import com.uroom.backend.dto.QuizAnswerRequest;
 import com.uroom.backend.dto.RoomMemberResponse;
 import com.uroom.backend.repository.RoomMemberRepository;
@@ -91,6 +92,46 @@ public class RoomMemberService {
             .collect(Collectors.toList());
     }
 
+    public List<MemberWithProfileResponse> getRoomMembersWithProfiles(UUID roomId) {
+        return roomMemberRepository.findByRoomId(roomId).stream()
+            .filter(m -> m.getStatus() == MemberStatus.ACTIVE)
+            .map(m -> toProfileResponse(m, roomId))
+            .collect(Collectors.toList());
+    }
+
+    public List<MemberWithProfileResponse> getPendingMembers(UUID roomId) {
+        return roomMemberRepository.findByRoomId(roomId).stream()
+            .filter(m -> m.getStatus() == MemberStatus.PENDING)
+            .map(m -> toProfileResponse(m, roomId))
+            .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void acceptMember(UUID roomId, UUID userId) {
+        RoomMember member = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+            .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        member.setStatus(MemberStatus.ACTIVE);
+        roomMemberRepository.save(member);
+
+        Room room = roomRepository.findById(roomId)
+            .orElseThrow(() -> new IllegalArgumentException("Room not found"));
+        room.setCurrentMembers(room.getCurrentMembers() + 1);
+        roomRepository.save(room);
+
+        userRepository.findById(userId).ifPresent(user -> {
+            user.addXp(50);
+            userRepository.save(user);
+        });
+    }
+
+    @Transactional
+    public void rejectMember(UUID roomId, UUID userId) {
+        RoomMember member = roomMemberRepository.findByRoomIdAndUserId(roomId, userId)
+            .orElseThrow(() -> new IllegalArgumentException("Member not found"));
+        member.setStatus(MemberStatus.REJECTED);
+        roomMemberRepository.save(member);
+    }
+
     public List<RoomMemberResponse> getUserRooms(UUID userId) {
         return roomMemberRepository.findByUserId(userId).stream()
             .filter(m -> m.getStatus() == MemberStatus.ACTIVE)
@@ -139,5 +180,26 @@ public class RoomMemberService {
             member.getStatus().name(),
             member.getJoinedAt()
         );
+    }
+
+    private MemberWithProfileResponse toProfileResponse(RoomMember member, UUID roomId) {
+        return userRepository.findById(member.getUserId())
+            .map(user -> new MemberWithProfileResponse(
+                user.getId(),
+                user.getName(),
+                user.getPhotoUrl(),
+                user.getUniversity(),
+                user.getAge(),
+                user.getAbout(),
+                user.getInterests(),
+                user.getSkills(),
+                user.getLevel(),
+                user.getXp(),
+                user.getStreak(),
+                member.getRole(),
+                member.getStatus().name(),
+                member.getJoinedAt()
+            ))
+            .orElseThrow(() -> new IllegalArgumentException("User not found: " + member.getUserId()));
     }
 }

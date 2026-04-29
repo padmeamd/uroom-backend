@@ -29,9 +29,10 @@ public class ChatService {
     private final RoomRepository roomRepository;
     private final RoomMemberRepository roomMemberRepository;
 
+    @Transactional
     public ChatRoomResponse getChatByRoomId(UUID roomId, UUID currentUserId) {
         Chat chat = chatRepository.findByRoomId(roomId)
-            .orElseThrow(() -> new IllegalArgumentException("Chat not found for room: " + roomId));
+            .orElseGet(() -> chatRepository.save(new Chat(roomId)));
         
         Room room = roomRepository.findById(roomId)
             .orElseThrow(() -> new IllegalArgumentException("Room not found: " + roomId));
